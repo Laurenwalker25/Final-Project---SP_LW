@@ -11,6 +11,7 @@ library(tidyverse)
 library(tidymodels)
 library(dplyr)
 library(broom)
+library(Stat2Data)
 flights<- read_csv("Clean_Dataset.csv")
 ```
 
@@ -48,7 +49,7 @@ https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction
 
 ### Research Question and Hypothesis
 
-After doing some research, we found out that the typical price of a domestic flight in India is ~ 7,000 INR (As per SkyScanner, in May 2023.  Keeping in mind our motivation for this project, the main research question that we will explore through our final project,is: "For flights that are departing out of cities, to what extent do the source destination, arrival time, departure time,and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR?"
+After doing some research, we found out that the typical price of a domestic flight in India is ~ 7,000 INR (As per SkyScanner, in May 2023.  Keeping in mind our motivation for this project, the main research question that we will explore through our final project,is: "For flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR?"
 
 Our formal null hypothesis and alternative hypothesis based on this research question are as follows:
 
@@ -111,25 +112,58 @@ boxplot(duration~binary, data = flights2, title="Car Milage Data",
 
 
 ```
-Another important factor to consider is the duration of the flights. Based on the box plot, we observe that the median flight duration as well as the middle 50% of  flight durations for flights priced above 7,000 INR is about 5 hours more than the median flight duration and middle 50% of the data for flights priced 7,000 INR or below. Moreover, we notice that the box plot for fights costing 7000 or less INR is more right skewed than the box plot for flights costing more than 7000 INR, suggesting that more flight duration lie on the lower end of flight durations compared to flights costing more than 7000 INT. These findings indicate that flight durations are longer for flights costing more than 7000 INR than that of flights costing 7000 or less INR. These results were not suprising to us because we assumed that flights that lasted longer would cost more.
+Another important factor to consider is the duration of the flights. Based on the box plot, we observe that the median flight duration as well as the middle 50% of flight durations for flights priced above 7,000 INR is about 5 hours more than the median flight duration and middle 50% of the data for flights priced 7,000 INR or below. Moreover, we notice that the box plot for fights costing 7000 or less INR is more right skewed than the box plot for flights costing more than 7000 INR, suggesting that more flight duration lie on the lower end of flight durations compared to flights costing more than 7000 INT. These findings indicate that flight durations are longer for flights costing more than 7000 INR than that of flights costing 7000 or less INR. These results were not suprising to us because we assumed that flights that lasted longer would cost more.
 
 ## Results
 
-In order to answer our research question - for flights that are departing out of cities, to what extent do the source destination, arrival time, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR? - we created a logistic regression model.
+In order to answer our research question - for flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR? - we created a logistic regression model.
 
 ```{r model, warning=False, message=False}
-m1 <- lm(binary ~ destination_city + arrival_time + departure_time + days_left, 
-         data = flights2)
+m1 <- glm(binary ~ destination_city + duration + departure_time + days_left, 
+         data = flights2,
+         family = "binomial")
 summary(m1)
 ```
+```{r}
+exp(9.341e-04)
+```
+
+
+Our null hypothesis is that there is none of the aforementioned factors will be predictive of the odds that the flight price is above 7,000 INR, holding the other predictors constant. Our alternative hypothesis is that at least one of the aforementioned factors will be predictive of the odds that the flight price is above 7,000 INR, holding the other predictors constant. 
+
+For duration, the z-statistic is -41.223, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05 and because our p-value < 2e-16 < 0.05, we reject the null hypothesis. Holding all other predictors constant, there is evidence that duration will be predictive of the odds that the flight price is above 7,000 INR. Holding all other predictors constant, for one hour increase in flight duration, the odds of the flight costing more than 7000 INR is predicted to be multiplied by exp(7.375e-02) = 1.001. 
+
+For the number days before booking the flight, the z-statistic is 41.129, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05 and because our p-value < 2e-16 < 0.05, we reject the null hypothesis. Holding all other predictors constant, there is evidence that the number of days before booking the flight will be predictive of the odds that the flight price is above 7,000 INR. Holding all other predictors constant, for one hour increase in the number of days before booking the flight, the odds of the flight costing more than 7000 INR is predicted to be multiplied by exp(9.341e-04) = 1.077. 
+
+For departure time, compared to afternoon which is acting as a the baseline, the z-statistic for flights departing in the early morning, morning, evening, night, and late night are 7.411, 3.955, -0.596, 2.926, and 0.162, respectively, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05, and p-values of 1.26e-13, 7.66e-05, 0.003436  for early morning, morning, and night respectively 
+
+For destination city, compared to Dehli which acts as the baseline, the z-statistic is 3.392, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05 and because our p-value = 0.000694, there is evidence to suggest that destination 
+
+
+
 
 ## Diagnostics
 
 ```{r model, warning=False, message=False}
+emplogitplot1(binary ~ destination_city,
+              data = flights2,
+              ngroups = 10)
+
+emplogitplot1(binary ~ duration,
+              data = flights2,
+              ngroups = 10)
+
+emplogitplot1(binary ~ departure_time,
+              data = flights2,
+              ngroups = 10)
+
+emplogitplot1(binary ~ days_left,
+              data = flights2,
+              ngroups = 10)
 ```
 
 
-
+## Discussion
 
 
 
