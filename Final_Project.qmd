@@ -10,6 +10,7 @@ format: pdf
 library(tidyverse)
 library(tidymodels)
 library(dplyr)
+library(broom)
 flights<- read_csv("Clean_Dataset.csv")
 ```
 
@@ -17,16 +18,16 @@ flights<- read_csv("Clean_Dataset.csv")
 
 ### Project Motivation and Revelance
 
-The data set we selected for our final project is the "Flights" data set. We got this data set from Kaggle, and it contains 3000153 unique observations, each representing a flight from one of India's 6 metro cities. In order to collect the data, researchers made use of the Octoparse scraping tool to extract data from the website "Ease My Trip". Data was collected in two parts: one for economy class tickets and another for business class tickets. The data was collected for 50 days, from February 11th to March 31st, 2022.
+The data set we selected for our final project is the "Flights" data set. We got this data set from Kaggle, and it contains 3000153 unique observations, each representing a flight from one of India's 6 metro cities. In order to collect the data, researchers made use of the Octoparse scraping tool to extract data from the website "Ease My Trip". Data was collected in two parts: one for economy class tickets and another for business class tickets. The data was collected over a period of 50 days, from February 11th to March 31st, 2022.
 
-While Covid-19 took a toll on a lot of industries, one of the industries that it took a major toll on was the Airline industry. As a result, flight prices have significantly increased (https://www.nerdwallet.com/article/travel/travel-price-tracker). Both of us, have had a passion for travelling and seeing new places. However, as college students, we understand that travelling is a big cost. Hence, exploring how to strategically book tickets, depending on the number of stops, arrival/destination time, and airline is a topic that interested us.
+While Covid-19 took a toll on a lot of industries, one of the industries that it took a major toll on was the Airline industry. As a result, flight prices have significantly increased (https://www.nerdwallet.com/article/travel/travel-price-tracker). Both of us have had a passion for travelling and seeing new places. However, as college students, we understand that travelling is a big cost. Hence, exploring how to strategically book tickets, depending on the number of stops, arrival/destination time, and airline is a topic that interested us.
 
 As travel becomes a significant part of our lives again, this project has practical applications for individuals, businesses, and policymakers and can contribute to a better understanding of air travel pricing dynamics.
 
 ### Data
-Our data has 300153 observations and 12 variables. Each row in our dataset represents a particular flight. Each of the variables. The variables are explained below:
+Our data has 300153 observations and 12 variables. Each row in our dataset represents a particular flight. Each of the variables represent attributes of the flight. The variables are explained below:
 
-```{r echo= FALSE}
+```{r data-explanation, warning= FALSE, message=FALSE, echo= FALSE}
 my_variable <- c("Airline", "Flight", "Source City", "Departure Time", "Stops", "Arrival Time", "Dest City"
                  ,"Class", "Duration", "Days Left", "Price")
 
@@ -85,7 +86,7 @@ flights2 <- flights2 %>%
 
 ### Exploratory Data Analysis
 
-Before we explore our research question,  we are going to analyze summary statistics and other relevant relationships between our main response variable of interest Ticket Price and other variables in the data set such as duration, airline, class and days left. By understanding the patterns behind these trends, we will be able to effectively explore our research question.
+Before we explore our research question,  we are going to analyze summary statistics and other relevant relationships between our main response variable of interest, Ticket Price, and other variables in the data set such as duration, airline, class and days left. By understanding the patterns behind these trends, we will be able to effectively explore our research question.
 
 ```{r echo=FALSE}
 data_proportions <- flights2 %>%
@@ -101,9 +102,32 @@ ggplot(data_proportions, aes(x = airline, y = proportion_variable)) +
   theme_minimal()
 
 ```
-National airlines such as Vistara and Air India,  have the highest proportion of flights that we are considering expensive. The more commercial airlines have cheaper options. I found this quite interesting, because I would assume the national airlines would be cheaper and more affordable to all. We also see a great difference between the proportion of expensive flights within the airlines. This suggests that the airline chosen might be predictive of the odds of a flight being overpriced.  
+National airlines such as Vistara and Air India have the highest proportion of flights that we are considering expensive. The more commercial airlines have cheaper options. I found this quite interesting, because I would assume the national airlines would be cheaper and more affordable to all. We also see a great difference between the proportion of expensive flights within the airlines. This suggests that the airline chosen might be predictive of the odds of a flight being overpriced.  
 
-Another important factor to consider is the duration of the flights. 
+```{r boxplot-duration}
+
+boxplot(duration~binary, data = flights2, title="Car Milage Data",
+   ylab="Flight Duration (hours)", xlab="Price Above 7000 INR")
+
+
+```
+Another important factor to consider is the duration of the flights. Based on the box plot, we observe that the median flight duration as well as the middle 50% of  flight durations for flights priced above 7,000 INR is about 5 hours more than the median flight duration and middle 50% of the data for flights priced 7,000 INR or below. Moreover, we notice that the box plot for fights costing 7000 or less INR is more right skewed than the box plot for flights costing more than 7000 INR, suggesting that more flight duration lie on the lower end of flight durations compared to flights costing more than 7000 INT. These findings indicate that flight durations are longer for flights costing more than 7000 INR than that of flights costing 7000 or less INR. These results were not suprising to us because we assumed that flights that lasted longer would cost more.
+
+## Results
+
+In order to answer our research question - for flights that are departing out of cities, to what extent do the source destination, arrival time, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR? - we created a logistic regression model.
+
+```{r model, warning=False, message=False}
+m1 <- lm(binary ~ destination_city + arrival_time + departure_time + days_left, 
+         data = flights2)
+summary(m1)
+```
+
+## Diagnostics
+
+```{r model, warning=False, message=False}
+```
+
 
 
 
