@@ -49,7 +49,7 @@ https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction
 
 ### Research Question and Hypothesis
 
-After doing some research, we found out that the typical price of a domestic flight in India is ~ 7,000 INR (As per SkyScanner, in May 2023.  Keeping in mind our motivation for this project, the main research question that we will explore through our final project,is: "For flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR?"
+After doing some research, we found out that the typical price of a domestic flight in India is ~ 7,000 INR (As per SkyScanner, in May 2023. Keeping in mind our motivation for this project, the main research question that we will explore through our final project,is: "For flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR?"
 
 Our formal null hypothesis and alternative hypothesis based on this research question are as follows:
 
@@ -107,7 +107,8 @@ National airlines such as Vistara and Air India have the highest proportion of f
 
 ```{r boxplot-duration}
 
-boxplot(duration~binary, data = flights2, title="Car Milage Data",
+boxplot(duration~binary, data = flights2, main ="Longer Flights are More 
+        Likely to be Above 7000 INR",
    ylab="Flight Duration (hours)", xlab="Price Above 7000 INR")
 
 
@@ -118,14 +119,11 @@ Another important factor to consider is the duration of the flights. Based on th
 
 In order to answer our research question - for flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR? - we created a logistic regression model.
 
-```{r model, warning=False, message=False}
+```{r model, warning=FALSE, message=FALSE}
 m1 <- glm(binary ~ destination_city + duration + departure_time + days_left, 
          data = flights2,
          family = "binomial")
-summary(m1)
-```
-```{r}
-exp(-1.506e+01)
+tidy(m1)
 ```
 
 Our null hypothesis is that there is none of the aforementioned factors will be predictive of the odds that the flight price is above 7,000 INR, holding the other predictors constant. Our alternative hypothesis is that at least one of the aforementioned factors will be predictive of the odds that the flight price is above 7,000 INR, holding the other predictors constant. 
@@ -134,32 +132,34 @@ For duration, the z-statistic is -41.223, which follows a standard normal distri
 
 For the number days before booking the flight, the z-statistic is 41.129, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05 and because our p-value < 2e-16 < 0.05, we reject the null hypothesis. Holding all other predictors constant, there is evidence to suggest that the number of days before booking the flight will be predictive of the odds that the flight price is above 7,000 INR. Holding all other predictors constant, for one hour increase in the number of days before booking the flight, the odds of the flight costing more than 7000 INR is predicted to be multiplied by exp(9.341e-04) = 1.077. 
 
-For departure time, compared to afternoon departure which is acting as a the baseline, the z-statistic for flights departing in the early morning, morning, evening, night, and late night are 3.747, 2.101, -5.681, -7.898, and -0.166, respectively, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05, and p-values of 0.000179, 0.035669, 1.34e-08, and 2.84e-15 for early morning, morning, evening, and night respectively < 0.05. For late night, p-value = 0.867847 > 0.05. This suggests that we reject the null hypothesis for early morning, morning, evening, and night departure times and can conclude there is evidence to suggest that those departure times will be predictive of the odds that the flight price is above 7,000 INR while holding all other predictors constant and comparing to afternoon departure time. This also suggests that we fail reject the null hypothesis for late night departure time and can conlcude that there is not enought evidence to suggest that a late night departure time will be predictive of the odds that the flight price is above 7,000 INR while holding all other predictors constant and comparing to afternoon departure time. Holding all other predictors constant, comparing to an afternoon departure time, the odds of the flight costing more than 7000 INR is predicted to be multiplied by exp(1.493e-01) = 1.161, exp(8.292e-02) = 1.086, exp(-2.265e-01) = 0.797, exp(-3.665e-01) = 0.693, and exp(-1.506e+01) = 2.881 for early morning departure, morning departure, evening departure, night departure, and late night departure, respectivly.
+For departure time, compared to afternoon departure which is acting as a the baseline, the z-statistic for flights departing in the early morning, morning, evening, night, and late night are 3.747, 2.101, -5.681, -7.898, and -0.166, respectively, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05, and p-values of 0.000179, 0.035669, 1.34e-08, and 2.84e-15 for early morning, morning, evening, and night respectively < 0.05. For late night, p-value = 0.867847 > 0.05. This suggests that we reject the null hypothesis for early morning, morning, evening, and night departure times and can conclude there is evidence to suggest that those departure times will be predictive of the odds that the flight price is above 7,000 INR while holding all other predictors constant and comparing to afternoon departure time. This also suggests that we fail reject the null hypothesis for late night departure time and can conlcude that there is not enough evidence to suggest that a late night departure time will be predictive of the odds that the flight price is above 7,000 INR while holding all other predictors constant and comparing to afternoon departure time. Holding all other predictors constant, comparing to an afternoon departure time, the odds of the flight costing more than 7000 INR is predicted to be multiplied by exp(1.493e-01) = 1.161, exp(8.292e-02) = 1.086, exp(-2.265e-01) = 0.797, exp(-3.665e-01) = 0.693, and exp(-1.506e+01) = 2.881 for early morning departure, morning departure, evening departure, night departure, and late night departure, respectively.
 
 For destination city, compared to Dehli which acts as the baseline, the z-statistic is 3.392, which follows a standard normal distribution under the null hypothesis. Our significance level is 0.05 and because our p-value = 0.000694, we reject the null hypothesis. Holding all other predictors constant,  there is evidence to suggest that destination city will be predictive of the odds that the flight price is above 7,000 INR. Holding all other predictors constant, comparing to leaving from Mumbai, the odds of the flight costing more than 7000 INR is predicted to be multiplied by exp(2.498e-02) = 1.025.  
 
 ## Diagnostics
 
-```{r model, warning=False, message=False}
-emplogitplot1(binary ~ destination_city,
-              data = flights2,
-              ngroups = 10)
+```{r diagnostics, warning=FALSE, message=FALSE}
 
 emplogitplot1(binary ~ duration,
-              data = flights2,
-              ngroups = 10)
-
-emplogitplot1(binary ~ departure_time,
               data = flights2,
               ngroups = 10)
 
 emplogitplot1(binary ~ days_left,
               data = flights2,
               ngroups = 10)
+
 ```
 
 
 ## Discussion
+
+Our research question asked for flights that are departing out of cities were in, whether source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR. The results of hypothesis testing reveal that source destination, duration, most departure times, and days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR while late night departure time appears to not influence predictive odds. This information is important to consider while booking flights and looking for a less expensive option. For example, to achieve a better flight price, one might opt for flights that leave late at night or book their flight many days in advance. 
+
+This study has potential limitations. The data does not reflect general flight trends as the data was representative of flights that left from only select cities in India. This sample bias effects our ability to generalize over overall relationships. Because we did not collect this data, we have no way of correcting this limitation. However, in the future, the data collection could have been expanding to other cities, especially those from a variety of countries.
+
+Because we are working with a categorical binary variable, we chose to use logistic regression because logistic regression effectively models categorical and binary variables. The two logistic regression assumptions we considered during our analysis were independence within the observations and linearity between the log-odds of the response and the continuous predictors. In this case, we do not have independence, because knowing information about one flight might tell you information about another flight, especially if the observation corresponds to a recurring flight. In order to correct this failed assumption, we might in the future consider recurring flights or flights with more or less identical characteristics as a single flight. In this case, we do have linearity: the empirical logit plots show linearity for our continuous variables. 
+
+In terms of future work, many additional variables are available in the data set but were left out of our statistical analysis and could be included in a future analysis to understand how those other variables might affect flight prices. Additionally, we limited the number of cities used in our model; future work could include exploring flight prices out of some of those other cities. Lastly, one could choose a new research question and outcome variable to discover other relationships relating to flight data.
 
 
 
