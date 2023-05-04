@@ -132,7 +132,7 @@ We also considered adding an interaction term, however, we realized that in this
 Hence our linear model is as follows:
 Our linear model is as follows:
 
-$$ Price\sim \\ Destinationcity + Duration + Departure Time + Days Left  $$
+$$ \hat{Price}\sim \\ Destinationcity + Duration + Departure Time + Days Left  $$
 ```{r model, warning=FALSE, message=FALSE, echo=FALSE}
 m1 <- glm(binary ~ destination_city + duration + departure_time + days_left, 
          data = flights2,
@@ -181,9 +181,11 @@ In terms of future work, many additional variables are available in the data set
 # Sources:
 
 https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction
+
 https://www.nerdwallet.com/article/travel/travel-price-tracker
-Skyscanner 
-https://www.skyscanner.co.in/flights/domestic-country-flights/in/cheap-domestic-flights-in-india#:~:text=How%20much%20are%20domestic%20flights,flights%20is%20around%20%E2%82%B9%207%2C265. 
+
+Skyscanner for general research 
+
 
 
 
