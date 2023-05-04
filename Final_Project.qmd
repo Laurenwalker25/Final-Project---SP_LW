@@ -49,7 +49,7 @@ https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction
 
 ### Research Question and Hypothesis
 
-After doing some research, we found out that the typical price of a domestic flight in India is ~ 7,000 INR (As per SkyScanner, in May 2023. Keeping in mind our motivation for this project, the main research question that we will explore through our final project,is: "For flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR?"
+After doing some research, we found out that the typical price of a domestic flight in India is ~ 7,000 INR (As per SkyScanner, in May 2023). Keeping in mind our motivation for this project, the main research question that we will explore through our final project is: "For flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR?"
 
 Our formal null hypothesis and alternative hypothesis based on this research question are as follows:
 
@@ -105,7 +105,7 @@ ggplot(data_proportions, aes(x = airline, y = proportion_variable)) +
 ```
 National airlines such as Vistara and Air India have the highest proportion of flights that we are considering expensive. The more commercial airlines have cheaper options. I found this quite interesting, because I would assume the national airlines would be cheaper and more affordable to all. We also see a great difference between the proportion of expensive flights within the airlines. This suggests that the airline chosen might be predictive of the odds of a flight being overpriced.  
 
-```{r boxplot-duration}
+```{r boxplot-duration, echo=FALSE}
 
 boxplot(duration~binary, data = flights2, main ="Longer Flights are More 
         Likely to be Above 7000 INR",
@@ -113,17 +113,32 @@ boxplot(duration~binary, data = flights2, main ="Longer Flights are More
 
 
 ```
-Another important factor to consider is the duration of the flights. Based on the box plot, we observe that the median flight duration as well as the middle 50% of flight durations for flights priced above 7,000 INR is about 5 hours more than the median flight duration and middle 50% of the data for flights priced 7,000 INR or below. Moreover, we notice that the box plot for fights costing 7000 or less INR is more right skewed than the box plot for flights costing more than 7000 INR, suggesting that more flight duration lie on the lower end of flight durations compared to flights costing more than 7000 INT. These findings indicate that flight durations are longer for flights costing more than 7000 INR than that of flights costing 7000 or less INR. These results were not suprising to us because we assumed that flights that lasted longer would cost more.
+Another important factor to consider is the duration of the flights. Based on the box plot, we observe that the median flight duration as well as the middle 50% of flight durations for flights priced above 7,000 INR is about 5 hours more than the median flight duration and middle 50% of the data for flights priced 7,000 INR or below. Moreover, we notice that the box plot for fights costing 7000 or less INR is more right skewed than the box plot for flights costing more than 7000 INR, suggesting that more flight duration lie on the lower end of flight durations compared to flights costing more than 7000 INR. These findings indicate that flight durations are longer for flights costing more than 7000 INR than that of flights costing 7000 or less INR. These results were not suprising to us because we assumed that flights that lasted longer would cost more.
 
-## Results
+# Methodology
 
+### Our modeling Process
 In order to answer our research question - for flights that are departing out of cities, to what extent do the source destination, duration, departure time, and number of days before booking the flight influence the predictive odds of a flight being priced above 7,000 INR? - we created a logistic regression model.
 
-```{r model, warning=FALSE, message=FALSE}
+### Variable Selection 
+
+After using our domain knowledge, through our research and understanding of the airline industry, we decided that it would make the most sense to focus our research on understanding the relationship between destination city, duration, departure time, and days left. We believed that most of these factors are the factors that people take into consideration while booking flights. Most people cannot decide their source city. 
+
+We also considered adding an interaction term, however, we realized that in this case we decided that with our selected variables, there is a low chance that one of the variables depends on the other. 
+
+# Conclusion 
+### Results
+
+Hence our linear model is as follows:
+Our linear model is as follows:
+
+$$ Price\sim \\ Destinationcity + Duration + Departure Time + Days Left  $$
+```{r model, warning=FALSE, message=FALSE, echo=FALSE}
 m1 <- glm(binary ~ destination_city + duration + departure_time + days_left, 
          data = flights2,
          family = "binomial")
-tidy(m1)
+table_2 <- tidy(m1)
+knitr::kable(table_2, caption = "Results of our Model")
 ```
 
 Our null hypothesis is that there is none of the aforementioned factors will be predictive of the odds that the flight price is above 7,000 INR, holding the other predictors constant. Our alternative hypothesis is that at least one of the aforementioned factors will be predictive of the odds that the flight price is above 7,000 INR, holding the other predictors constant. 
@@ -138,7 +153,7 @@ For destination city, compared to Dehli which acts as the baseline, the z-statis
 
 ## Diagnostics
 
-```{r diagnostics, warning=FALSE, message=FALSE}
+```{r diagnostics, warning=FALSE, message=FALSE, echo=FALSE}
 
 emplogitplot1(binary ~ duration,
               data = flights2,
@@ -149,7 +164,7 @@ emplogitplot1(binary ~ days_left,
               ngroups = 10)
 
 ```
-
+Based on the graphs above, since the points are close to the line, we can say that linearity is fairly assumed for the two continuous variables in our model.
 
 ## Discussion
 
@@ -157,10 +172,18 @@ Our research question asked for flights that are departing out of cities were in
 
 This study has potential limitations. The data does not reflect general flight trends as the data was representative of flights that left from only select cities in India. This sample bias effects our ability to generalize over overall relationships. Because we did not collect this data, we have no way of correcting this limitation. However, in the future, the data collection could have been expanding to other cities, especially those from a variety of countries.
 
+Furthermore, our data doesn't look at a few important factors that influence flight price. Holidays and other big events also influence flight traffic, hence it would be important to take these factors into consideration while creating a model on the influence of flight prices. It is hard to keep track of this data and perhaps we would need to use mutliple models to keep track of this.  
+
 Because we are working with a categorical binary variable, we chose to use logistic regression because logistic regression effectively models categorical and binary variables. The two logistic regression assumptions we considered during our analysis were independence within the observations and linearity between the log-odds of the response and the continuous predictors. In this case, we do not have independence, because knowing information about one flight might tell you information about another flight, especially if the observation corresponds to a recurring flight. In order to correct this failed assumption, we might in the future consider recurring flights or flights with more or less identical characteristics as a single flight. In this case, we do have linearity: the empirical logit plots show linearity for our continuous variables. 
 
 In terms of future work, many additional variables are available in the data set but were left out of our statistical analysis and could be included in a future analysis to understand how those other variables might affect flight prices. Additionally, we limited the number of cities used in our model; future work could include exploring flight prices out of some of those other cities. Lastly, one could choose a new research question and outcome variable to discover other relationships relating to flight data.
 
+# Sources:
+
+https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction
+https://www.nerdwallet.com/article/travel/travel-price-tracker
+Skyscanner 
+https://www.skyscanner.co.in/flights/domestic-country-flights/in/cheap-domestic-flights-in-india#:~:text=How%20much%20are%20domestic%20flights,flights%20is%20around%20%E2%82%B9%207%2C265. 
 
 
 
